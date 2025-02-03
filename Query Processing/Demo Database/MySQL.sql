@@ -5,10 +5,10 @@
 -- .\DemoDB\MySQL.sql ----------
 ------------------------------------
 
-CREATE DATABASE Animal_Shelter;
+-- CREATE DATABASE Animal_Shelter;
 
 -- Connect to Animal_Shelter database
-USE Animal_Shelter;
+-- USE Animal_Shelter;
 
 DROP TABLE IF EXISTS Colors;
 
