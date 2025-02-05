@@ -191,3 +191,65 @@ GROUP BY GROUPING SETS (
                             ()
                         )
 ORDER BY Species, Breed;
+
+
+/*
+    Challenge
+
+    Count the number of vaccinations per:
+    Year            Staff member
+    Species         Staff member and species
+    Species and year
+    Latest vaccination year for each group
+*/
+SELECT          
+        COALESCE(CAST(YEAR(V.Vaccination_Time) AS VARCHAR(10)), 'All Years') Year,
+        COALESCE(V.Species, 'All Species') Species,
+        COALESCE(V.Email, 'All Staff') Email,
+        CASE WHEN GROUPING(V.Email) = 0
+            THEN MAX(P.First_Name)
+            ELSE ''
+            END AS First_Name,
+        CASE WHEN GROUPING(V.Email) = 0
+            THEN MAX(P.Last_Name)
+            ELSE ''
+            END AS Last_Name,
+        COUNT(*) AS Number_Of_Vaccinations,
+        MAX(YEAR(V.Vaccination_Time)) AS Latest_Vaccination_Year
+FROM    Vaccinations V
+JOIN    Persons P
+ON      V.Email = P.Email
+GROUP BY GROUPING SETS (
+                            (),
+                            YEAR(V.Vaccination_Time),
+                            V.Species,
+                            (YEAR(V.Vaccination_Time), V.Species)
+                            V.Email,
+                            (V.Email, V.Species)
+                        )
+ORDER BY 
+            Year,
+            Species,
+            First_Name,
+            Last_Name;
+
+
+-- Recursive with
+SELECT CAST(day AS DATE) AS day
+FROM generate_series(   '2019-01-01'::date, -- Start::Type
+                        '2019-12-31',       -- End
+                        '1 Day'             -- Interval
+                    ) AS days_of_2019(day)
+ORDER BY day ASC;
+
+WITH days_of_2019(day) AS
+    (   SELECT CAST('20190101' AS DATE)
+        UNION ALL
+        SELECT CAST(day+INTERVAL '1 DAY' AS DATE)
+        FROM days_of_2019
+        WHERE day < CAST('20191231' AS DATE)
+    )
+SELECT *
+FROM days_of_2019
+ORDER BY day ASC
+OPTION(MAXRECURSION 365);
